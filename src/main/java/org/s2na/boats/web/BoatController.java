@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @CrossOrigin("*")
-@RequestMapping(value = "/api/boats", method = { RequestMethod.POST })
+@RequestMapping(value = "api/boats", method = {RequestMethod.POST})
 @RestController
 public class BoatController {
 
@@ -19,19 +19,44 @@ public class BoatController {
     private BoatRepository boatRepository;
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<Boat> listBoats(){
+    public List<Boat> listBoats() {
         return boatRepository.findAll();
     }
 
-    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Optional<Boat> singleBoat(@PathVariable Integer id){
+    @GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Optional<Boat> singleBoat(@PathVariable Integer id) {
         return boatRepository.findById(id);
     }
 
-    @PostMapping(value = "api/boats")
-    public ResponseEntity<Boat> createBoat(@RequestBody Boat boat){
-        return ResponseEntity.ok(boatRepository.save(boat));
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public Boat createBoat(@RequestBody Boat boat) {
+        return boatRepository.save(boat);
     }
+
+    @PutMapping(value ="{id}")
+    public ResponseEntity<Boat> updateBoat(@PathVariable Integer id, @RequestBody Boat boat) {
+        Optional<Boat> existingBoat = boatRepository.findById(id);
+        if (existingBoat.isPresent()) {
+            Boat updateBoat = existingBoat.get();
+            updateBoat.setName(boat.getName());
+            updateBoat.setClasse(boat.getClasse());
+            updateBoat.setLength(boat.getLength());
+            updateBoat.setTonnage(boat.getTonnage());
+
+            Boat savedBoat = boatRepository.save(updateBoat);
+            return ResponseEntity.ok(savedBoat);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @DeleteMapping(value = "{id}")
+    public ResponseEntity<Object> deleteBoat(@PathVariable Integer id) {
+        boatRepository.deleteById(id);
+        return ResponseEntity.noContent().build();
+
+    }
+
 }
 
 
