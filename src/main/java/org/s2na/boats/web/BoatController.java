@@ -33,7 +33,7 @@ public class BoatController {
         return boatRepository.save(boat);
     }
 
-    @PutMapping(value ="{id}")
+    @PutMapping(value = "{id}")
     public ResponseEntity<Boat> updateBoat(@PathVariable Integer id, @RequestBody Boat boat) {
         Optional<Boat> existingBoat = boatRepository.findById(id);
         if (existingBoat.isPresent()) {
